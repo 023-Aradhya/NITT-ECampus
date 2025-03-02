@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import "./courses.css";
 
 const NewCourse = () => {
-  const [courseData, setCourseData] = useState({ title: "", description: "", details: "", duration: "", fee: "",requirement: "",contact: "" });
+  const [courseData, setCourseData] = useState({ title: "", description: "", admin: "" });
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
 
@@ -62,13 +62,9 @@ const NewCourse = () => {
     <div className="form-container" style={{ marginTop: "80px" }}>
       <h2>Add a New Course</h2>
       <form onSubmit={handleSubmit}>
-        <input type="text" name="title" placeholder="Title" value={courseData.title} onChange={handleChange} required />
+        <input type="text" name="title" placeholder="Course Name" value={courseData.title} onChange={handleChange} required />
         <input type="text" name="description" placeholder="Description" value={courseData.description} onChange={handleChange} required />
-        <textarea name="details" placeholder="Details" value={courseData.details} onChange={handleChange} required />
-        <input type="number" name="duration" placeholder="Duration (Years)" value={courseData.duration} onChange={handleChange} required />
-        <input type="number" name="fee" placeholder="Fee (in Rupees)" value={courseData.fee} onChange={handleChange} required />
-        <input type="text" name="requirement" placeholder="Requirements to get Admission" value={courseData.requirement} onChange={handleChange} required />
-        <input type="text" name="contact" placeholder="Contact details regarding Commitee" value={courseData.contact} onChange={handleChange} required />
+        <input type="text" name="admin" placeholder="Content Admin Name" value={courseData.admin} onChange={handleChange} required />
         <button type="submit">Add Course</button>
       </form>
     </div>

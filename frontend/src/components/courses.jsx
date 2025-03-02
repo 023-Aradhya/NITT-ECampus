@@ -4,7 +4,7 @@ import { useAuth } from "../context/authContext"; // Import authentication conte
 import "./courses.css";
 
 const Courses = () => {
-  const [courses, setCourses] = useState([]);
+  const [courses, setCourses] = useState([]); 
   const [searchTerm, setSearchTerm] = useState("");
   const { currentUser } = useAuth(); // Get current user from auth context
 
@@ -37,10 +37,7 @@ const Courses = () => {
             <div key={course._id} className="course-card">
               <h2 className="course-title">{course.title}</h2>
               <p className="course-description">{course.description}</p>
-              <p><strong>Duration:</strong> {course.duration} years</p>
-              <p><strong>Fee:</strong> ₹{course.fee}</p>
-              <p><strong>Contact Details :</strong> {course.contact}</p>
-              <p><strong>Requirements : </strong> {course.requirement}</p>
+              <p><strong>Content Admin Name : </strong> {course.admin}</p>
               <Link to={`/courses/${course._id}`}>
                 <button className="explore-button">Explore</button>
               </Link>

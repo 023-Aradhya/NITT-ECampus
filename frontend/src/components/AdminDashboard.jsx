@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from "../context/authContext";
-import Sidebar from "./Sidebar";  // Import Sidebar Component
+import Sidebar from "./Sidebar";  
 import './AdminDashboard.css';
-import Footer from "./Footer";
+
 
 const AdminDashboard = () => {
   const [admins, setAdmins] = useState([]);

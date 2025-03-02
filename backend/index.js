@@ -118,26 +118,52 @@ app.post("/login", async (req, res) => {
 
 // Route: Admin Adds a Course
 app.post("/api/newCourse", authenticate, authorizeAdmin, async (req, res) => {
-  const { title, description, duration, fee, details,contact,requirement } = req.body;
+  const { title, description, admin } = req.body;
   console.log("Received course data:", req.body); // Debug log
 
   // Validate that all required fields are provided
-  if (!title || !description || !duration || !fee) {
+  if (!title || !description||!admin ) {
     return res.status(400).json({ message: "All fields are required" });
   }
 
   try {
+    const email = `${adminName.toLowerCase().replace(/\s/g, "")}@courseadmin.com`;
+    const password = Math.random().toString(36).slice(-8);
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Create Content Admin User
+    const contentAdmin = new User({
+      name: adminName,
+      email,
+      password: hashedPassword,
+      role: "content_admin",
+    });
+
+    await contentAdmin.save();
+
     const newCourse = new CourseModel({
       title,
       description,
-      duration,
-      fee,
-      details, // Add details here as per request
-      contact,
-      requirement,
+      admin:contentAdmin._id,
     });
 
     await newCourse.save();
+
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: "Your Content Admin Credentials",
+      text: `Hello ${adminName},\n\nYou have been assigned as the content admin for the course: "${title}".\n\nYour login credentials:\nEmail: ${email}\nPassword: ${password}\n\nPlease change your password after logging in.\n\nBest Regards,\nAdmin Team`,
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error("Error sending email:", error);
+        return res.status(500).json({ message: "Error sending email", error });
+      }
+      console.log("Email sent:", info.response);
+    });
+    
     res.status(201).json({ message: "Course added successfully", course: newCourse });
   } catch (error) {
     console.error("Course creation error:", error); // Log error for debugging
