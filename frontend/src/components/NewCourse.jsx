@@ -3,7 +3,13 @@ import { useNavigate } from "react-router-dom";
 import "./courses.css";
 
 const NewCourse = () => {
-  const [courseData, setCourseData] = useState({ title: "", description: "", admin: "" });
+  const [courseData, setCourseData] = useState({ 
+      title: "", 
+      description: "", 
+      email: "" ,
+      password:""
+    });
+
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
 
@@ -64,7 +70,9 @@ const NewCourse = () => {
       <form onSubmit={handleSubmit}>
         <input type="text" name="title" placeholder="Course Name" value={courseData.title} onChange={handleChange} required />
         <input type="text" name="description" placeholder="Description" value={courseData.description} onChange={handleChange} required />
-        <input type="text" name="admin" placeholder="Content Admin Name" value={courseData.admin} onChange={handleChange} required />
+        <input type="name" name="name" placeholder="Content Admin Name" value={courseData.name} onChange={handleChange} required />
+        <input type="email" name="email" placeholder="Content Admin Email" value={courseData.email} onChange={handleChange} required />
+        <input type="password" name="password" placeholder="Content Admin Password" value={courseData.password} onChange={handleChange} required />
         <button type="submit">Add Course</button>
       </form>
     </div>

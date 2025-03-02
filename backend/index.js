@@ -7,6 +7,7 @@ require("dotenv").config();
 const FormDataModel = require("./models/FormData");
 const CourseModel = require("./models/Course");
 const ApplicationForm = require("./models/ApplicationFormSchema");
+const nodemailer = require("nodemailer");
 
 const app = express();
 app.use(express.json());
@@ -117,29 +118,27 @@ app.post("/login", async (req, res) => {
 });
 
 // Route: Admin Adds a Course
+
 app.post("/api/newCourse", authenticate, authorizeAdmin, async (req, res) => {
-  const { title, description, admin } = req.body;
+  const { title, description, email,password ,name} = req.body;
   console.log("Received course data:", req.body); // Debug log
 
   // Validate that all required fields are provided
-  if (!title || !description||!admin ) {
+  if (!title || !description||!email ||!password || !name) {
     return res.status(400).json({ message: "All fields are required" });
   }
-
   try {
-    const email = `${adminName.toLowerCase().replace(/\s/g, "")}@courseadmin.com`;
-    const password = Math.random().toString(36).slice(-8);
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Create Content Admin User
-    const contentAdmin = new User({
-      name: adminName,
-      email,
-      password: hashedPassword,
-      role: "content_admin",
-    });
-
-    await contentAdmin.save();
+    let contentAdmin = await FormDataModel.findOne({ email });
+    if (!contentAdmin) {
+      const hashedPassword = await bcrypt.hash(password, 10);
+      contentAdmin = new FormDataModel({
+        name,
+        email,
+        password: hashedPassword,
+        role: "content_admin",
+      });
+      await contentAdmin.save();
+    }
 
     const newCourse = new CourseModel({
       title,
@@ -149,11 +148,18 @@ app.post("/api/newCourse", authenticate, authorizeAdmin, async (req, res) => {
 
     await newCourse.save();
 
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER, 
+        pass: process.env.EMAIL_PASS, 
+      },
+    });
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: email,
       subject: "Your Content Admin Credentials",
-      text: `Hello ${adminName},\n\nYou have been assigned as the content admin for the course: "${title}".\n\nYour login credentials:\nEmail: ${email}\nPassword: ${password}\n\nPlease change your password after logging in.\n\nBest Regards,\nAdmin Team`,
+      text: `Hello ,\n\nYou have been assigned as the content admin for the course: "${title}".\n\nYour login credentials:\nEmail: ${email}\nPassword: ${password}\n\nPlease change your password after logging in.\n\nBest Regards,\nAdmin Team`,
     };
 
     transporter.sendMail(mailOptions, (error, info) => {
@@ -174,8 +180,8 @@ app.post("/api/newCourse", authenticate, authorizeAdmin, async (req, res) => {
 // Route: Fetch All Users (admin only)
 app.get("/api/users", authenticate, authorizeAdmin, async (req, res) => {
   try {
-    const users = await FormDataModel.find(); // Fetch all users from FormDataModel
-    res.json(users); // Return the users
+    const users = await FormDataModel.find(); 
+    res.json(users); 
   } catch (error) {
     console.error("Error fetching users:", error); // Log error for debugging
     res.status(500).json({ message: "Error fetching users", error });
